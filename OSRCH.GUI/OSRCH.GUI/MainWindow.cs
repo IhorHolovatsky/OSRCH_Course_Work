@@ -180,10 +180,9 @@ namespace OSRCH.GUI
         {
             using (var pen = new Pen(Color.Black, PEN_WEIGHT))
             {
-                var relativeX = bounds.Width / 2;
-                var relativeY = bounds.Height / 2;
-
                 var centerPoint = new Point(bounds.Width / 2, bounds.Height / 2);
+
+                //TODO: To move left or right, modify RotateRightDegrees or RotateLeftDegrees
                 var craneDickEndPoint = CalculateCircumferencePoint(RotateRightDegrees - RotateLeftDegrees, centerPoint, bounds.Height / 2);
 
                 //draw crane dick
