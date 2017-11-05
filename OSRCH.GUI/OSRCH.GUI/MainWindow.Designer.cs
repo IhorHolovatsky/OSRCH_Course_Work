@@ -28,9 +28,12 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.pictureBox2 = new System.Windows.Forms.PictureBox();
+            
             this.logsTextBox = new System.Windows.Forms.RichTextBox();
+
+            this.pbProjectionX = new System.Windows.Forms.PictureBox();
+            this.pbProjectionY = new System.Windows.Forms.PictureBox();
+
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.labelInstructionName = new System.Windows.Forms.Label();
@@ -39,28 +42,29 @@
             this.importButton = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbProjectionX)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbProjectionY)).BeginInit();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
-            // pictureBox1
+            // pbProjectionX
             // 
-            this.pictureBox1.Location = new System.Drawing.Point(40, 53);
-            this.pictureBox1.Margin = new System.Windows.Forms.Padding(4);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(401, 278);
-            this.pictureBox1.TabIndex = 0;
-            this.pictureBox1.TabStop = false;
-            // 
-            // pictureBox2
-            // 
-            this.pictureBox2.Location = new System.Drawing.Point(505, 53);
-            this.pictureBox2.Margin = new System.Windows.Forms.Padding(4);
-            this.pictureBox2.Name = "pictureBox2";
-            this.pictureBox2.Size = new System.Drawing.Size(401, 278);
-            this.pictureBox2.TabIndex = 1;
-            this.pictureBox2.TabStop = false;
+
+            this.pbProjectionX.Location = new System.Drawing.Point(30, 43);
+            this.pbProjectionX.Name = "pbProjectionX";
+            this.pbProjectionX.Size = new System.Drawing.Size(301, 226);
+            this.pbProjectionX.TabIndex = 0;
+            this.pbProjectionX.TabStop = false;
+            this.pbProjectionX.Paint += new System.Windows.Forms.PaintEventHandler(this.pbProjectionX_Paint);
+
+      
+            this.pbProjectionY.Location = new System.Drawing.Point(379, 43);
+            this.pbProjectionY.Name = "pbProjectionY";
+            this.pbProjectionY.Size = new System.Drawing.Size(301, 226);
+            this.pbProjectionY.TabIndex = 1;
+            this.pbProjectionY.TabStop = false;
+            this.pbProjectionY.Paint += new System.Windows.Forms.PaintEventHandler(this.pbProjectionY_Paint);
+
             // 
             // logsTextBox
             // 
@@ -168,14 +172,18 @@
             this.Controls.Add(this.label2);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
+
             this.Controls.Add(this.logsTextBox);
-            this.Controls.Add(this.pictureBox2);
-            this.Controls.Add(this.pictureBox1);
+       
             this.Margin = new System.Windows.Forms.Padding(4);
+
+            this.Controls.Add(this.pbProjectionY);
+            this.Controls.Add(this.pbProjectionX);
+
             this.Name = "MainWindow";
             this.Text = "ОСРЧ Лаба 1";
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbProjectionX)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbProjectionY)).EndInit();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             this.ResumeLayout(false);
@@ -185,9 +193,13 @@
 
         #endregion
 
-        private System.Windows.Forms.PictureBox pictureBox1;
-        private System.Windows.Forms.PictureBox pictureBox2;
+
         private System.Windows.Forms.RichTextBox logsTextBox;
+
+        private System.Windows.Forms.PictureBox pbProjectionX;
+        private System.Windows.Forms.PictureBox pbProjectionY;
+   
+
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.Label labelInstructionName;
