@@ -34,7 +34,7 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.labelInstructionName = new System.Windows.Forms.Label();
-            this.button3 = new System.Windows.Forms.Button();
+            this.btnStop = new System.Windows.Forms.Button();
             this.startButton = new System.Windows.Forms.Button();
             this.importButton = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
@@ -84,7 +84,7 @@
             // groupBox2
             // 
             this.groupBox2.Controls.Add(this.labelInstructionName);
-            this.groupBox2.Controls.Add(this.button3);
+            this.groupBox2.Controls.Add(this.btnStop);
             this.groupBox2.Controls.Add(this.startButton);
             this.groupBox2.Controls.Add(this.importButton);
             this.groupBox2.Location = new System.Drawing.Point(706, 12);
@@ -103,14 +103,15 @@
             this.labelInstructionName.TabIndex = 3;
             this.labelInstructionName.Text = "text.txt";
             // 
-            // button3
+            // btnStop
             // 
-            this.button3.Location = new System.Drawing.Point(143, 91);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(98, 36);
-            this.button3.TabIndex = 2;
-            this.button3.Text = "Стоп";
-            this.button3.UseVisualStyleBackColor = true;
+            this.btnStop.Location = new System.Drawing.Point(143, 91);
+            this.btnStop.Name = "btnStop";
+            this.btnStop.Size = new System.Drawing.Size(98, 36);
+            this.btnStop.TabIndex = 2;
+            this.btnStop.Text = "Скинути";
+            this.btnStop.UseVisualStyleBackColor = true;
+            this.btnStop.Click += new System.EventHandler(this.btnStop_Click);
             // 
             // startButton
             // 
@@ -185,7 +186,7 @@
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.Label labelInstructionName;
-        private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Button btnStop;
         private System.Windows.Forms.Button startButton;
         private System.Windows.Forms.Button importButton;
         private System.Windows.Forms.Label label2;

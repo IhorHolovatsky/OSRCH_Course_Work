@@ -83,15 +83,66 @@ namespace OSRCH.GUI
         {
             startButton.IsAccessible = false;
 
-            SimulatorBusinessLogic.RunSimulation(new CraneObject(),_synchronizationContext,logsTextBox,
-                delegate(SimulationResponseModel model)
-                {
-                    MessageBox.Show(this, model.Message, (model.IsSuccess) ? "Simulation end" : "Error happened",
-                        MessageBoxButtons.OK);
-                    startButton.IsAccessible = true;
-                });
+            //SimulatorBusinessLogic.RunSimulation(new CraneObject(),_synchronizationContext,logsTextBox,
+            //    delegate(SimulationResponseModel model)
+            //    {
+            //        MessageBox.Show(this, model.Message, (model.IsSuccess) ? "Simulation end" : "Error happened",
+            //            MessageBoxButtons.OK);
+            //        startButton.IsAccessible = true;
+            //    });
 
-            
+            Task.Run(() =>
+            {
+                //ToDo вся робота з вантажем
+                foreach (var currentInstructionsString in SimulatorBusinessLogic.CurrentInstructionsStrings)
+                {
+                    var value = SimulatorBusinessLogic.GetValueFromCommandString(currentInstructionsString);
+                    if (currentInstructionsString.Contains("Up<"))
+                    {
+                        MoveTopLength += value;
+                        _synchronizationContext.Post(o =>
+                        {
+                            logsTextBox.Text += $"{Environment.NewLine} Crane goes up for {value}";
+                        }, value);
+                    }
+                    if (currentInstructionsString.Contains("Down<"))
+                    {
+                        MoveBottomLength += value;
+                        _synchronizationContext.Post(o =>
+                        {
+                            logsTextBox.Text += $"{Environment.NewLine} Crane goes down for {value}";
+                        }, value);
+                    }
+                    if (currentInstructionsString.Contains("Forward<"))
+                    {
+                        MoveRightLength += value;
+                        _synchronizationContext.Post(o =>
+                        {
+                            logsTextBox.Text += $"{Environment.NewLine} Crane goes forward for {value}";
+                        }, value);
+                    }
+                    if (currentInstructionsString.Contains("Backward<"))
+                    {
+                        MoveLeftLength += value;
+                        _synchronizationContext.Post(o =>
+                        {
+                            logsTextBox.Text += $"{Environment.NewLine} Crane goes backward for {value}";
+                        }, value);
+                    }
+                    if (currentInstructionsString.Contains("Rotate<"))
+                    {
+                        RotateLeftDegrees += value;
+                        _synchronizationContext.Post(o =>
+                        {
+                            logsTextBox.Text += $"{Environment.NewLine} Crane rotates for {value}";
+                        }, value);
+                    }
+
+                    ReDrawCrane();
+                    Thread.Sleep(1000);
+                }
+            });
+
 
         }
 
@@ -166,7 +217,7 @@ namespace OSRCH.GUI
                 //con't move to top or bottom more than halfOfWorkingHeight
                 if (!ValidateSemanticX(workingWidth, workingHeight, positionX, positionY))
                 {
-                    throw new IndexOutOfRangeException();
+                    //throw new IndexOutOfRangeException();
                 }
 
 
@@ -254,6 +305,17 @@ namespace OSRCH.GUI
             res.Y = (int)y;
 
             return res;
+        }
+
+        private void btnStop_Click(object sender, EventArgs e)
+        {
+            MoveRightLength = 0;
+            MoveBottomLength = 0;
+            MoveLeftLength = 0;
+            MoveTopLength = 0;
+            RotateRightDegrees = 0;
+            RotateLeftDegrees = 0;
+            ReDrawCrane();
         }
     }
 }
