@@ -24,22 +24,37 @@ namespace OSRCH.GUI
         private const int SHIPMENT_WIDTH = 20;
         private const int SHIPMENT_HEIGHT = 30;
 
+        private const int CRANE_BODY_RADIUS = 8;
+
         private const int PEN_WEIGHT = 2;
         #endregion
 
-        #region Properties
+        #region Commands
 
         protected int MoveLeftLength { get; set; }
         protected int MoveRightLength { get; set; }
         protected int MoveTopLength { get; set; }
         protected int MoveBottomLength { get; set; }
 
+        protected int RotateLeftDegrees { get; set; }
+        protected int RotateRightDegrees { get; set; }
         #endregion
 
         public MainWindow()
         {
             InitializeComponent();
         }
+
+        private void ReDrawCrane()
+        {
+            pbProjectionX.Image = null;
+            InitCraneX(pbProjectionX.CreateGraphics(), pbProjectionX.ClientRectangle);
+
+            pbProjectionY.Image = null;
+            InitCraneY(pbProjectionY.CreateGraphics(), pbProjectionY.ClientRectangle);
+        }
+
+        #region Projection X
 
         private void pbProjectionX_Paint(object sender, PaintEventArgs e)
         {
@@ -48,15 +63,6 @@ namespace OSRCH.GUI
 
             InitCraneX(graphics, bounds);
         }
-
-
-        private void ReDrawCrane()
-        {
-            pbProjectionX.Image = null;
-            InitCraneX(pbProjectionX.CreateGraphics(), pbProjectionX.ClientRectangle);
-        }
-
-        #region Projection X
 
         private void InitCraneX(Graphics graphics, Rectangle bounds)
         {
@@ -140,22 +146,83 @@ namespace OSRCH.GUI
 
         #endregion
 
+        #region Projection Y
 
+        private void pbProjectionY_Paint(object sender, PaintEventArgs e)
+        {
+            InitCraneY(e.Graphics, e.ClipRectangle);
+        }
+
+        private void InitCraneY(Graphics graphics, Rectangle bounds)
+        {
+            DrawStaticElementsY(graphics, bounds);
+            DrawDynamicElementsY(graphics, bounds);
+        }
+        private void DrawStaticElementsY(Graphics graphics, Rectangle bounds)
+        {
+            using (var pen = new Pen(Color.Black, PEN_WEIGHT))
+            {
+                var relativeX = bounds.Width / 2;
+                var relativeY = bounds.Height / 2;
+
+                //draw crane body
+                graphics.DrawEllipse(pen,
+                                     new Rectangle()
+                                     {
+                                         Height = CRANE_BODY_RADIUS,
+                                         Width = CRANE_BODY_RADIUS,
+                                         Location = new Point(relativeX - CRANE_BODY_RADIUS / 2, relativeY - CRANE_BODY_RADIUS / 2)
+                                     });
+            }
+        }
+
+        private void DrawDynamicElementsY(Graphics graphics, Rectangle bounds)
+        {
+            using (var pen = new Pen(Color.Black, PEN_WEIGHT))
+            {
+                var relativeX = bounds.Width / 2;
+                var relativeY = bounds.Height / 2;
+
+                var centerPoint = new Point(bounds.Width / 2, bounds.Height / 2);
+                var craneDickEndPoint = CalculateCircumferencePoint(RotateRightDegrees - RotateLeftDegrees, centerPoint, bounds.Height / 2);
+
+                //draw crane dick
+                graphics.DrawLine(pen, centerPoint, craneDickEndPoint);
+            }
+        }
+
+        #endregion
 
         private void button4_Click(object sender, EventArgs e)
         {
-            MoveBottomLength += 5;
+            RotateLeftDegrees += 5;
+            ReDrawCrane();
+            //MoveBottomLength += 5;
 
-            try
-            {
-                ReDrawCrane();
-            }
-            catch (IndexOutOfRangeException ex)
-            {
-                MoveBottomLength -= 5;
-                ReDrawCrane();
-                MessageBox.Show("Impossible to move crane, because it's not in his working area!");
-            }
+            //try
+            //{
+            //    ReDrawCrane();
+            //}
+            //catch (IndexOutOfRangeException ex)
+            //{
+            //    MoveBottomLength -= 5;
+            //    ReDrawCrane();
+            //    MessageBox.Show("Impossible to move crane, because it's not in his working area!");
+            //}
+        }
+        
+        private Point CalculateCircumferencePoint(int angleInDegrees, Point center, int radius)
+        {
+            var angleInRadians = angleInDegrees * (Math.PI / 180);
+            var res = new Point();
+
+            var x = center.X + radius * Math.Cos(angleInRadians);
+            var y = center.Y + radius * Math.Sin(angleInRadians);
+
+            res.X = (int)x;
+            res.Y = (int)y;
+
+            return res;
         }
     }
 }
