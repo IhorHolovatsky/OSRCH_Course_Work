@@ -20,7 +20,7 @@ namespace OSRCH.GUI
 
         //length of foot line
         private const int FOOT_LENGTH = 20;
-        
+
         private const int SHIPMENT_WIDTH = 20;
         private const int SHIPMENT_HEIGHT = 30;
 
@@ -46,23 +46,25 @@ namespace OSRCH.GUI
             var graphics = e.Graphics;
             var bounds = e.ClipRectangle;
 
-            InitCrane(graphics, bounds);
+            InitCraneX(graphics, bounds);
         }
 
 
         private void ReDrawCrane()
         {
             pbProjectionX.Image = null;
-            InitCrane(pbProjectionX.CreateGraphics(), pbProjectionX.ClientRectangle);
+            InitCraneX(pbProjectionX.CreateGraphics(), pbProjectionX.ClientRectangle);
         }
 
-        private void InitCrane(Graphics graphics, Rectangle bounds)
+        #region Projection X
+
+        private void InitCraneX(Graphics graphics, Rectangle bounds)
         {
-            DrawStaticElements(graphics, bounds);
-            DrawDynamicElements(graphics, bounds);
+            DrawStaticElementsX(graphics, bounds);
+            DrawDynamicElementsX(graphics, bounds);
         }
 
-        private void DrawStaticElements(Graphics graphics, Rectangle bounds)
+        private void DrawStaticElementsX(Graphics graphics, Rectangle bounds)
         {
             using (var pen = new Pen(Color.Black, PEN_WEIGHT))
             {
@@ -82,7 +84,7 @@ namespace OSRCH.GUI
             }
         }
 
-        private void DrawDynamicElements(Graphics graphics, Rectangle bounds)
+        private void DrawDynamicElementsX(Graphics graphics, Rectangle bounds)
         {
             using (var pen = new Pen(Color.Black, PEN_WEIGHT))
             {
@@ -90,7 +92,7 @@ namespace OSRCH.GUI
                 var relativeY = bounds.Y + BODY_MARGIN_TOP;
 
                 //width where we can move dick to LEFT or RIGHT
-                var workingWidth = bounds.Width - relativeX ;
+                var workingWidth = bounds.Width - relativeX;
                 var halfOfWorkingWidth = workingWidth / 2;
 
                 //height where we can move dick to UP or DOWN
@@ -98,7 +100,7 @@ namespace OSRCH.GUI
                 var halfOfWorkingHeight = workingHeight / 2;
 
                 //TODO: add or subtract, to move shipment LEFT or RIGHT
-                var positionX = halfOfWorkingWidth + MoveRightLength - MoveLeftLength ;
+                var positionX = halfOfWorkingWidth + MoveRightLength - MoveLeftLength;
 
                 //TODO: add or subtract, to move shipment TOP or DOWN
                 var positionY = halfOfWorkingHeight + MoveBottomLength - MoveTopLength;
@@ -106,7 +108,7 @@ namespace OSRCH.GUI
                 //TODO: add validation
                 //con't move to left or right more than halfOfWorkingWidth
                 //con't move to top or bottom more than halfOfWorkingHeight
-                if (!ValidateSemantic(workingWidth, workingHeight, positionX, positionY))
+                if (!ValidateSemanticX(workingWidth, workingHeight, positionX, positionY))
                 {
                     throw new IndexOutOfRangeException();
                 }
@@ -117,13 +119,13 @@ namespace OSRCH.GUI
 
 
                 //draw shipment
-                graphics.DrawRectangle(pen, relativeX + positionX - SHIPMENT_WIDTH/2, relativeY + positionY, SHIPMENT_WIDTH, SHIPMENT_HEIGHT);
+                graphics.DrawRectangle(pen, relativeX + positionX - SHIPMENT_WIDTH / 2, relativeY + positionY, SHIPMENT_WIDTH, SHIPMENT_HEIGHT);
             }
         }
 
-        private bool ValidateSemantic(int workingWidth, int workingHeight, int positionX, int positionY)
+        private bool ValidateSemanticX(int workingWidth, int workingHeight, int positionX, int positionY)
         {
-            if (positionX <= 0 || positionX + SHIPMENT_WIDTH/2 >= workingWidth)
+            if (positionX <= 0 || positionX + SHIPMENT_WIDTH / 2 >= workingWidth)
             {
                 return false;
             }
@@ -135,6 +137,10 @@ namespace OSRCH.GUI
 
             return true;
         }
+
+        #endregion
+
+
 
         private void button4_Click(object sender, EventArgs e)
         {
