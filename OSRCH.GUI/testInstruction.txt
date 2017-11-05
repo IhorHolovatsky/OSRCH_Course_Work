@@ -1,0 +1,3 @@
+Up<10>
+Forward<100>
+Down<10>
