@@ -241,24 +241,6 @@ namespace OSRCH.GUI
         }
 
         #endregion
-
-        private void button4_Click(object sender, EventArgs e)
-        {
-            RotateLeftDegrees += 5;
-            ReDrawCrane();
-            //MoveBottomLength += 5;
-
-            //try
-            //{
-            //    ReDrawCrane();
-            //}
-            //catch (IndexOutOfRangeException ex)
-            //{
-            //    MoveBottomLength -= 5;
-            //    ReDrawCrane();
-            //    MessageBox.Show("Impossible to move crane, because it's not in his working area!");
-            //}
-        }
         
         private Point CalculateCircumferencePoint(int angleInDegrees, Point center, int radius)
         {
