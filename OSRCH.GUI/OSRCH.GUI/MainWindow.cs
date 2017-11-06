@@ -137,6 +137,20 @@ namespace OSRCH.GUI
                             logsTextBox.Text += $"{Environment.NewLine} Crane rotates for {value}";
                         }, value);
                     }
+                    if (currentInstructionsString.Contains("TakeCargo"))
+                    {
+                        _synchronizationContext.Post(o =>
+                        {
+                            logsTextBox.Text += $"{Environment.NewLine} Take cargo";
+                        }, value);
+                    }
+                    if (currentInstructionsString.Contains("ReliseCargo"))
+                    {
+                        _synchronizationContext.Post(o =>
+                        {
+                            logsTextBox.Text += $"{Environment.NewLine} Release cargo";
+                        }, value);
+                    }
 
                     ReDrawCrane();
                     Thread.Sleep(1000);
