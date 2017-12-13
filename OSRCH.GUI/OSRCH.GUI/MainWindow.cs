@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -45,11 +46,26 @@ namespace OSRCH.GUI
         protected int RotateRightDegrees { get; set; }
         #endregion
 
+        #region Interrupts
+
+        protected AutoResetEvent ContinuationEvent;
+        protected bool IsInterrupted { get; set; }
+        protected InterruptCode Interrupt { get; set; }
+
+        protected enum InterruptCode
+        {
+            Barrier,
+            PeopleInWorkingZone,
+            BadWeather
+        }
+        #endregion
+
 
         public MainWindow()
         {
             InitializeComponent();
             _synchronizationContext = SynchronizationContext.Current;
+            ContinuationEvent = new AutoResetEvent(false);
         }
 
         private void importButton_Click(object sender, EventArgs e)
@@ -96,13 +112,71 @@ namespace OSRCH.GUI
                 //ToDo вся робота з вантажем
                 foreach (var currentInstructionsString in SimulatorBusinessLogic.CurrentInstructionsStrings)
                 {
+                    if (IsInterrupted)
+                    {
+                        int backupMoveLeftLength = MoveLeftLength;
+                        int backupMoveRightLength = MoveRightLength;
+                        int backupMoveTopLength = MoveTopLength;
+                        int backupMoveBottomLength = MoveBottomLength;
+
+                        int backupRotateLeftDegrees = RotateLeftDegrees;
+                        int backupRotateRightDegrees = RotateRightDegrees;
+
+                        switch (Interrupt)
+                        {
+                            case InterruptCode.Barrier:
+                                // Wait for clearing
+                                _synchronizationContext.Post(o =>
+                                {
+                                    Log("Interrupt : Barrier in working zone");
+                                }, null);                               
+                                break;
+                            case InterruptCode.PeopleInWorkingZone:
+                                // Wait for clearing
+                                _synchronizationContext.Post(o =>
+                                {
+                                    Log("Interrupt : People in working zone");
+                                }, null);          
+                                break;
+                            case InterruptCode.BadWeather:
+                                _synchronizationContext.Post(o =>
+                                {
+                                    Log("Interrupt : Bad weather");
+                                }, null);
+                                // Put down and stop
+                                MoveBottomLength = MoveTopLength = 0;
+                                ReDrawCrane();
+                                break;
+                            default:
+                                _synchronizationContext.Post(o =>
+                                {
+                                    Log("Interrupt : Unknown interrupt");
+                                }, null);
+                                break;
+                        }
+                        // Delay before start next command
+                        ContinuationEvent.WaitOne();
+                        // Clear interrupt variables
+                        IsInterrupted = false;
+                        // Restore position
+                        MoveLeftLength = backupMoveLeftLength;
+                        MoveRightLength = backupMoveRightLength;
+                        MoveTopLength = backupMoveTopLength;
+                        MoveBottomLength = backupMoveBottomLength;
+
+                        RotateLeftDegrees = backupRotateLeftDegrees;
+                        RotateRightDegrees = backupRotateRightDegrees;
+                        ReDrawCrane();
+                        Thread.Sleep(1000);
+                    }
+
                     var value = SimulatorBusinessLogic.GetValueFromCommandString(currentInstructionsString);
                     if (currentInstructionsString.Contains("Up<"))
                     {
                         MoveTopLength += value;
                         _synchronizationContext.Post(o =>
                         {
-                            logsTextBox.Text += $"{Environment.NewLine} Crane goes up for {value}";
+                            Log($"Crane goes up for {value}");
                         }, value);
                     }
                     if (currentInstructionsString.Contains("Down<"))
@@ -110,7 +184,7 @@ namespace OSRCH.GUI
                         MoveBottomLength += value;
                         _synchronizationContext.Post(o =>
                         {
-                            logsTextBox.Text += $"{Environment.NewLine} Crane goes down for {value}";
+                            Log($"Crane goes down for {value}");
                         }, value);
                     }
                     if (currentInstructionsString.Contains("Forward<"))
@@ -118,7 +192,7 @@ namespace OSRCH.GUI
                         MoveRightLength += value;
                         _synchronizationContext.Post(o =>
                         {
-                            logsTextBox.Text += $"{Environment.NewLine} Crane goes forward for {value}";
+                            Log($"Crane goes forward for {value}");
                         }, value);
                     }
                     if (currentInstructionsString.Contains("Backward<"))
@@ -126,7 +200,7 @@ namespace OSRCH.GUI
                         MoveLeftLength += value;
                         _synchronizationContext.Post(o =>
                         {
-                            logsTextBox.Text += $"{Environment.NewLine} Crane goes backward for {value}";
+                            Log($"Crane goes backward for {value}");
                         }, value);
                     }
                     if (currentInstructionsString.Contains("Rotate<"))
@@ -134,21 +208,21 @@ namespace OSRCH.GUI
                         RotateLeftDegrees += value;
                         _synchronizationContext.Post(o =>
                         {
-                            logsTextBox.Text += $"{Environment.NewLine} Crane rotates for {value}";
+                            Log($"Crane rotates for {value}");
                         }, value);
                     }
                     if (currentInstructionsString.Contains("TakeCargo"))
                     {
                         _synchronizationContext.Post(o =>
                         {
-                            logsTextBox.Text += $"{Environment.NewLine} Take cargo";
+                            Log("Take cargo");
                         }, value);
                     }
                     if (currentInstructionsString.Contains("ReliseCargo"))
                     {
                         _synchronizationContext.Post(o =>
                         {
-                            logsTextBox.Text += $"{Environment.NewLine} Release cargo";
+                            Log("Release cargo");
                         }, value);
                     }
 
@@ -156,8 +230,19 @@ namespace OSRCH.GUI
                     Thread.Sleep(1000);
                 }
             });
+        }
 
-
+        private void Log(string message)
+        {
+            string logString = $"{Environment.NewLine}Date: {DateTime.Now:d} | Time: {DateTime.Now:T} | Action : {message}";
+            logsTextBox.Text += logString;
+            using (var logFileStream = new FileStream(Path.Combine(Environment.CurrentDirectory, "log.txt"), FileMode.Append, FileAccess.Write, FileShare.None))
+            {
+                using (var logFileStreamWriter = new StreamWriter(logFileStream))
+                {
+                    logFileStreamWriter.Write(logString);
+                }
+            }
         }
 
         private void ReDrawCrane()
@@ -224,7 +309,7 @@ namespace OSRCH.GUI
                 var positionX = halfOfWorkingWidth + MoveRightLength - MoveLeftLength;
 
                 //TODO: add or subtract, to move shipment TOP or DOWN
-                var positionY = halfOfWorkingHeight + MoveBottomLength - MoveTopLength;
+                var positionY = workingHeight-SHIPMENT_HEIGHT/2+/*halfOfWorkingHeight +*/ MoveBottomLength - MoveTopLength;
 
                 //TODO: add validation
                 //con't move to left or right more than halfOfWorkingWidth
@@ -330,6 +415,34 @@ namespace OSRCH.GUI
             RotateRightDegrees = 0;
             RotateLeftDegrees = 0;
             ReDrawCrane();
+        }
+
+        private void HandleInterrupt(InterruptCode code)
+        {
+            ContinueExecution.Visible = true;
+            Interrupt = code;
+            IsInterrupted = true;
+        }
+
+        private void BarrierInterruptButton_Click(object sender, EventArgs e)
+        {
+            HandleInterrupt(InterruptCode.Barrier);
+        }
+
+        private void PeopleInWorkingZoneInterruptButton_Click(object sender, EventArgs e)
+        {
+            HandleInterrupt(InterruptCode.PeopleInWorkingZone);
+        }
+
+        private void WeatherInterruptButton_Click(object sender, EventArgs e)
+        {
+            HandleInterrupt(InterruptCode.BadWeather);
+        }
+
+        private void ContinueExecution_Click(object sender, EventArgs e)
+        {
+            ContinuationEvent.Set();
+            ContinueExecution.Visible = false;
         }
     }
 }

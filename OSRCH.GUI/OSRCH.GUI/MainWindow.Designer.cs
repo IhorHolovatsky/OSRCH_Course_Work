@@ -32,6 +32,10 @@
             this.pbProjectionX = new System.Windows.Forms.PictureBox();
             this.pbProjectionY = new System.Windows.Forms.PictureBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.ContinueExecution = new System.Windows.Forms.Button();
+            this.WeatherInterruptButton = new System.Windows.Forms.Button();
+            this.PeopleInWorkingZoneInterruptButton = new System.Windows.Forms.Button();
+            this.BarrierInterruptButton = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.labelInstructionName = new System.Windows.Forms.Label();
             this.btnStop = new System.Windows.Forms.Button();
@@ -41,6 +45,7 @@
             this.label3 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pbProjectionX)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbProjectionY)).BeginInit();
+            this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -55,7 +60,7 @@
             // pbProjectionX
             // 
             this.pbProjectionX.Location = new System.Drawing.Point(33, 39);
-            this.pbProjectionX.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.pbProjectionX.Margin = new System.Windows.Forms.Padding(2);
             this.pbProjectionX.Name = "pbProjectionX";
             this.pbProjectionX.Size = new System.Drawing.Size(306, 230);
             this.pbProjectionX.TabIndex = 0;
@@ -65,7 +70,7 @@
             // pbProjectionY
             // 
             this.pbProjectionY.Location = new System.Drawing.Point(367, 39);
-            this.pbProjectionY.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.pbProjectionY.Margin = new System.Windows.Forms.Padding(2);
             this.pbProjectionY.Name = "pbProjectionY";
             this.pbProjectionY.Size = new System.Drawing.Size(313, 230);
             this.pbProjectionY.TabIndex = 1;
@@ -74,12 +79,57 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.ContinueExecution);
+            this.groupBox1.Controls.Add(this.WeatherInterruptButton);
+            this.groupBox1.Controls.Add(this.PeopleInWorkingZoneInterruptButton);
+            this.groupBox1.Controls.Add(this.BarrierInterruptButton);
             this.groupBox1.Location = new System.Drawing.Point(706, 293);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(264, 235);
             this.groupBox1.TabIndex = 3;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Переривання";
+            // 
+            // ContinueExecution
+            // 
+            this.ContinueExecution.Location = new System.Drawing.Point(101, 59);
+            this.ContinueExecution.Name = "ContinueExecution";
+            this.ContinueExecution.Size = new System.Drawing.Size(75, 23);
+            this.ContinueExecution.TabIndex = 3;
+            this.ContinueExecution.Text = "Continue";
+            this.ContinueExecution.UseVisualStyleBackColor = true;
+            this.ContinueExecution.Visible = false;
+            this.ContinueExecution.Click += new System.EventHandler(this.ContinueExecution_Click);
+            // 
+            // WeatherInterruptButton
+            // 
+            this.WeatherInterruptButton.Location = new System.Drawing.Point(183, 30);
+            this.WeatherInterruptButton.Name = "WeatherInterruptButton";
+            this.WeatherInterruptButton.Size = new System.Drawing.Size(75, 23);
+            this.WeatherInterruptButton.TabIndex = 2;
+            this.WeatherInterruptButton.Text = "BadWeather";
+            this.WeatherInterruptButton.UseVisualStyleBackColor = true;
+            this.WeatherInterruptButton.Click += new System.EventHandler(this.WeatherInterruptButton_Click);
+            // 
+            // PeopleInWorkingZoneInterruptButton
+            // 
+            this.PeopleInWorkingZoneInterruptButton.Location = new System.Drawing.Point(101, 30);
+            this.PeopleInWorkingZoneInterruptButton.Name = "PeopleInWorkingZoneInterruptButton";
+            this.PeopleInWorkingZoneInterruptButton.Size = new System.Drawing.Size(75, 23);
+            this.PeopleInWorkingZoneInterruptButton.TabIndex = 1;
+            this.PeopleInWorkingZoneInterruptButton.Text = "People";
+            this.PeopleInWorkingZoneInterruptButton.UseVisualStyleBackColor = true;
+            this.PeopleInWorkingZoneInterruptButton.Click += new System.EventHandler(this.PeopleInWorkingZoneInterruptButton_Click);
+            // 
+            // BarrierInterruptButton
+            // 
+            this.BarrierInterruptButton.Location = new System.Drawing.Point(19, 30);
+            this.BarrierInterruptButton.Name = "BarrierInterruptButton";
+            this.BarrierInterruptButton.Size = new System.Drawing.Size(75, 23);
+            this.BarrierInterruptButton.TabIndex = 0;
+            this.BarrierInterruptButton.Text = "Barrier";
+            this.BarrierInterruptButton.UseVisualStyleBackColor = true;
+            this.BarrierInterruptButton.Click += new System.EventHandler(this.BarrierInterruptButton_Click);
             // 
             // groupBox2
             // 
@@ -167,6 +217,7 @@
             this.Text = "ОСРЧ Лаба 1";
             ((System.ComponentModel.ISupportInitialize)(this.pbProjectionX)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbProjectionY)).EndInit();
+            this.groupBox1.ResumeLayout(false);
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             this.ResumeLayout(false);
@@ -191,6 +242,10 @@
         private System.Windows.Forms.Button importButton;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Button WeatherInterruptButton;
+        private System.Windows.Forms.Button PeopleInWorkingZoneInterruptButton;
+        private System.Windows.Forms.Button BarrierInterruptButton;
+        private System.Windows.Forms.Button ContinueExecution;
     }
 }
 
