@@ -66,6 +66,10 @@ namespace OSRCH.GUI
             InitializeComponent();
             _synchronizationContext = SynchronizationContext.Current;
             ContinuationEvent = new AutoResetEvent(false);
+            WorkingWidth = pbProjectionX.ClientRectangle.Width - (pbProjectionX.ClientRectangle.X + BODY_MARGIN_LEFT + FOOT_LENGTH / 2 + SHIPMENT_WIDTH / 2 + PEN_WEIGHT);
+            WorkingHeight = pbProjectionX.ClientRectangle.Height - (pbProjectionX.ClientRectangle.Y + BODY_MARGIN_TOP);
+            StartPositionX = WorkingWidth / 2;
+            StartPositionY = WorkingHeight - SHIPMENT_HEIGHT;
         }
 
         private void importButton_Click(object sender, EventArgs e)
@@ -171,60 +175,84 @@ namespace OSRCH.GUI
                     }
 
                     var value = SimulatorBusinessLogic.GetValueFromCommandString(currentInstructionsString);
+
+                    String message;
                     if (currentInstructionsString.Contains("Up<"))
                     {
-                        MoveTopLength += value;
-                        _synchronizationContext.Post(o =>
+                        if (ValidateTop(value))
                         {
-                            Log($"Crane goes up for {value}");
-                        }, value);
+                            MoveTopLength += value;
+                            message = $"Crane goes up for {value}";
+                        }
+                        else
+                        {
+                            message = $"Illegal argument for up command ({value})";
+                        }
                     }
-                    if (currentInstructionsString.Contains("Down<"))
+                    else if (currentInstructionsString.Contains("Down<"))
                     {
-                        MoveBottomLength += value;
-                        _synchronizationContext.Post(o =>
+                        if (ValidateBottom(value))
                         {
-                            Log($"Crane goes down for {value}");
-                        }, value);
+                            MoveBottomLength += value;
+                            message = $"Crane goes down for {value}";
+                        }
+                        else
+                        {
+                            message = $"Illegal argument for down command ({value})";
+                        }
                     }
-                    if (currentInstructionsString.Contains("Forward<"))
+                    else if (currentInstructionsString.Contains("Forward<"))
                     {
-                        MoveRightLength += value;
-                        _synchronizationContext.Post(o =>
+                        if (ValidateRight(value))
                         {
-                            Log($"Crane goes forward for {value}");
-                        }, value);
+                            MoveRightLength += value;
+                            message = $"Crane goes forward for {value}";
+                        }
+                        else
+                        {
+                            message = $"Illegal argument for forward command ({value})";
+                        }
                     }
-                    if (currentInstructionsString.Contains("Backward<"))
+                    else if (currentInstructionsString.Contains("Backward<"))
                     {
-                        MoveLeftLength += value;
-                        _synchronizationContext.Post(o =>
+                        if (ValidateLeft(value))
                         {
-                            Log($"Crane goes backward for {value}");
-                        }, value);
+                            MoveLeftLength += value;
+                            message = $"Crane goes backward for {value}";
+                        }
+                        else
+                        {
+                            message = $"Illegal argument for backward command ({value})";
+                        }
                     }
-                    if (currentInstructionsString.Contains("Rotate<"))
+                    else if (currentInstructionsString.Contains("Rotate<"))
                     {
-                        RotateLeftDegrees += value;
-                        _synchronizationContext.Post(o =>
+                        if (ValidateRotationAngle(value))
                         {
-                            Log($"Crane rotates for {value}");
-                        }, value);
+                            RotateLeftDegrees += value;
+                            message = $"Crane rotates for {value}";
+                        }
+                        else
+                        {
+                            message = $"Illegal argument for rotate command ({value})";
+                        }
                     }
-                    if (currentInstructionsString.Contains("TakeCargo"))
+                    else if (currentInstructionsString.Contains("TakeCargo"))
                     {
-                        _synchronizationContext.Post(o =>
-                        {
-                            Log("Take cargo");
-                        }, value);
+                        message = "Take cargo";
                     }
-                    if (currentInstructionsString.Contains("ReliseCargo"))
+                    else if (currentInstructionsString.Contains("ReleaseCargo"))
                     {
-                        _synchronizationContext.Post(o =>
-                        {
-                            Log("Release cargo");
-                        }, value);
+                        message = "Release cargo";
                     }
+                    else
+                    {
+                        message = "Unknown command!";
+                    }
+                    _synchronizationContext.Post(o =>
+                    {
+                        Log(message);
+                    }, value);
 
                     ReDrawCrane();
                     Thread.Sleep(1000);
@@ -244,6 +272,47 @@ namespace OSRCH.GUI
                 }
             }
         }
+
+        #region Validation
+
+        private bool ValidateRotationAngle(int angle)
+        {
+            return Math.Abs(angle) <= 360;
+        }
+
+        private bool ValidateTop(int value)
+        {
+            return ValidateMoving(MoveTopLength + value, MoveBottomLength, MoveLeftLength, MoveRightLength);
+        }
+
+        private bool ValidateBottom(int value)
+        {
+            return ValidateMoving(MoveTopLength, MoveBottomLength + value, MoveLeftLength, MoveRightLength);
+        }
+
+        private bool ValidateLeft(int value)
+        {
+            return ValidateMoving(MoveTopLength, MoveBottomLength, MoveLeftLength + value, MoveRightLength);
+        }
+
+        private bool ValidateRight(int value)
+        {
+            return ValidateMoving(MoveTopLength, MoveBottomLength, MoveLeftLength, MoveRightLength + value);
+        }
+
+        private bool ValidateMoving(int moveTop, int moveBottom, int moveLeft, int moveRight)
+        {
+            int upperBorderX = WorkingWidth - SHIPMENT_WIDTH / 2;
+            int lowBorderX = 0 + SHIPMENT_WIDTH / 2;
+            int upperBorderY = WorkingHeight - SHIPMENT_HEIGHT;
+            int lowBorderY = 0 + SHIPMENT_HEIGHT;
+
+            int nowPositionY = StartPositionY + (moveBottom - moveTop);
+            int nowPositionX = StartPositionX + (moveRight - moveLeft);
+            return nowPositionY <= upperBorderY && nowPositionY >= lowBorderY && nowPositionX <= upperBorderX && nowPositionX >= lowBorderX;
+        }
+
+        #endregion
 
         private void ReDrawCrane()
         {
@@ -290,6 +359,12 @@ namespace OSRCH.GUI
             }
         }
 
+        protected int WorkingHeight;
+        protected int WorkingWidth;
+
+        protected int StartPositionX;
+        protected int StartPositionY;
+
         private void DrawDynamicElementsX(Graphics graphics, Rectangle bounds)
         {
             using (var pen = new Pen(Color.Black, PEN_WEIGHT))
@@ -299,17 +374,17 @@ namespace OSRCH.GUI
 
                 //width where we can move dick to LEFT or RIGHT
                 var workingWidth = bounds.Width - relativeX;
-                var halfOfWorkingWidth = workingWidth / 2;
+                //var halfOfWorkingWidth = workingWidth / 2;
 
                 //height where we can move dick to UP or DOWN
                 var workingHeight = bounds.Height - relativeY - SHIPMENT_HEIGHT / 2;
-                var halfOfWorkingHeight = workingHeight / 2;
+                //var halfOfWorkingHeight = workingHeight / 2;
 
                 //TODO: add or subtract, to move shipment LEFT or RIGHT
-                var positionX = halfOfWorkingWidth + MoveRightLength - MoveLeftLength;
+                var positionX = StartPositionX/*halfOfWorkingWidth*/ + MoveRightLength - MoveLeftLength;
 
                 //TODO: add or subtract, to move shipment TOP or DOWN
-                var positionY = workingHeight-SHIPMENT_HEIGHT/2+/*halfOfWorkingHeight +*/ MoveBottomLength - MoveTopLength;
+                var positionY = StartPositionY/*workingHeight-SHIPMENT_HEIGHT/2+halfOfWorkingHeight */+ MoveBottomLength - MoveTopLength;
 
                 //TODO: add validation
                 //con't move to left or right more than halfOfWorkingWidth
